@@ -3,20 +3,20 @@ using DiffFinder.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.FileProviders;
+using System.Text;
 
 namespace DiffFinder.Controllers
 {
     public class DifferenceInformationController : Controller
     {
         private readonly MvcWebAppDbContext _context;
-        private readonly IFileProvider fileProvider;
         private readonly Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnvironment;
+        private string ResultMessage;
+        private List<DiffsOffsets> DiffsOffsetsList;
 
-        public DifferenceInformationController(MvcWebAppDbContext context, IFileProvider fileprovider, Microsoft.AspNetCore.Hosting.IHostingEnvironment env)
+        public DifferenceInformationController(MvcWebAppDbContext context, Microsoft.AspNetCore.Hosting.IHostingEnvironment env)
         {
             _context = context;
-            fileProvider = fileprovider;
             hostingEnvironment = env;
         }
 
@@ -61,8 +61,13 @@ namespace DiffFinder.Controllers
         {
             if (ModelState.IsValid)
             {
+                CalculateDifference(diffrenceInformation);
+                diffrenceInformation.Result = ResultMessage;
+                diffrenceInformation.DiffsOffsets = DiffsOffsetsList;
                 _context.Add(diffrenceInformation);
                 await _context.SaveChangesAsync();
+
+                //DiffOffsetleri de kaydet :) 
                 
                 return RedirectToAction(nameof(Index));
             }
@@ -72,11 +77,6 @@ namespace DiffFinder.Controllers
         // GET: DifferenceInformationController/Edit/5
         public async Task<IActionResult> Edit(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
             var diffInfo = await _context.DiffrenceInformation.FindAsync(id);
             if(diffInfo == null)
             {
@@ -152,5 +152,60 @@ namespace DiffFinder.Controllers
         {
             return _context.DiffrenceInformation.Any(x => x.DifferenceInformationId == id);
         }
+
+        #region Calculate Difference
+
+        private void CalculateDifference(DiffrenceInformation diffrenceInformation)
+        {
+            string leftString = diffrenceInformation.LeftString;
+            string rightString = diffrenceInformation.RightString;
+
+            byte[] leftData = Convert.FromBase64String(leftString);
+            string decodedLeftString = Encoding.UTF8.GetString(leftData);
+
+            byte[] rightData = Convert.FromBase64String(rightString);
+            string decodedRightString = Encoding.UTF8.GetString(rightData);
+
+            if(leftData.Length != rightData.Length)
+            {
+                ResultMessage = "Inputs are of different size.";
+                DiffsOffsetsList = new List<DiffsOffsets>();
+            }
+            List<DiffsOffsets> diffOffsetList = new List<DiffsOffsets>();
+            for(int i = 0; i < decodedLeftString.Length; i++)
+            {
+                int diffCount = 0;
+                byte[] byteListLeftStringChar = Encoding.UTF8.GetBytes(decodedLeftString[i].ToString());
+                byte[] byteListRightStringChar = Encoding.UTF8.GetBytes(decodedRightString[i].ToString());
+                for(int j = 0; j < byteListLeftStringChar.Length; j++)
+                {
+                    if(byteListLeftStringChar[j] != byteListRightStringChar[j])
+                    {
+                        diffCount++;
+                    }
+                }
+                if (diffCount != 0)
+                {
+                    DiffsOffsets diffsOffsets = new DiffsOffsets();
+                    diffsOffsets.Offset = i;
+                    diffsOffsets.Diffs = diffCount;
+                    diffOffsetList.Add(diffsOffsets);
+                }
+
+
+                DiffsOffsetsList = diffOffsetList;
+            }
+            
+            if (String.Equals(decodedLeftString, decodedRightString))
+            {
+                ResultMessage = "Inputs were equal.";
+            }
+            else
+            {
+                ResultMessage = "Offsets and lenghts of the diffences.";
+            }
+        }
+
+        #endregion
     }
 }

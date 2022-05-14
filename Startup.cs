@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using DiffFinder.Data;
 using Microsoft.AspNetCore.Authorization;
@@ -39,6 +38,9 @@ namespace DiffFinder
             ).SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             services.AddAuthorization();
+            services.AddControllers();
+            services.AddMvc(option => option.EnableEndpointRouting = false);
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace DiffFinder.Data
 {    public class MvcWebAppDbContext : DbContext
@@ -14,5 +13,6 @@ namespace DiffFinder.Data
         }
 
         public DbSet<DiffrenceInformation> DiffrenceInformation { get; set; }
+        public DbSet<DiffsOffsets> DiffsOffsets { get; set; }
     }
 }

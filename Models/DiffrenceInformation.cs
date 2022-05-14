@@ -14,6 +14,8 @@ namespace DiffFinder.Models
         public string LeftString { get; set; }
         [Required]
         public string RightString { get; set; }
-        public bool Result { get; set; }
+        public string Result { get; set; }
+
+        public virtual ICollection<DiffsOffsets> DiffsOffsets { get; set; }
     }
 }
