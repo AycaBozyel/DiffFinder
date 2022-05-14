@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using DiffFinder.Data;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.Extensions.FileProviders;
 
 namespace DiffFinder
 {

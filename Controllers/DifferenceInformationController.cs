@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
+using DiffFinder.Business;
 
 namespace DiffFinder.Controllers
 {
@@ -11,16 +12,13 @@ namespace DiffFinder.Controllers
     {
         private readonly MvcWebAppDbContext _context;
         private readonly Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnvironment;
-        private string ResultMessage;
-        private List<DiffsOffsets> DiffsOffsetsList;
+        public DiffFinderService diffFinderService = new DiffFinderService();
 
         public DifferenceInformationController(MvcWebAppDbContext context, Microsoft.AspNetCore.Hosting.IHostingEnvironment env)
         {
             _context = context;
             hostingEnvironment = env;
         }
-
-
         // GET: DifferenceInformationController
         public async Task<IActionResult> Index()
         {
@@ -61,9 +59,9 @@ namespace DiffFinder.Controllers
         {
             if (ModelState.IsValid)
             {
-                CalculateDifference(diffrenceInformation);
-                diffrenceInformation.Result = ResultMessage;
-                diffrenceInformation.DiffsOffsets = DiffsOffsetsList;
+                Response response = diffFinderService.CalculateDifference(diffrenceInformation);
+                diffrenceInformation.Result = response.ResultMessage;
+                diffrenceInformation.DiffsOffsets = response.DiffsOffsetList;
                 _context.Add(diffrenceInformation);
 
                 _ = _context.SaveChangesAsync();
@@ -165,56 +163,5 @@ namespace DiffFinder.Controllers
             return _context.DiffrenceInformation.Any(x => x.DifferenceInformationId == id);
         }
 
-        #region Calculate Difference
-
-        private void CalculateDifference(DiffrenceInformation diffrenceInformation)
-        {
-            string leftString = diffrenceInformation.LeftString.Trim();
-            string rightString = diffrenceInformation.RightString.Trim();
-
-            byte[] leftData = Encoding.UTF8.GetBytes(leftString);
-            byte[] rightData = Encoding.UTF8.GetBytes(rightString);
-
-            if(leftData.Length != rightData.Length)
-            {
-                ResultMessage = "Inputs are of different size.";
-                DiffsOffsetsList = new List<DiffsOffsets>();
-            }
-            List<DiffsOffsets> diffOffsetList = new List<DiffsOffsets>();
-            for(int i = 0; i < leftString.Length; i++)
-            {
-                int diffCount = 0;
-                byte[] byteListLeftStringChar = Encoding.UTF8.GetBytes(leftString[i].ToString());
-                byte[] byteListRightStringChar = Encoding.UTF8.GetBytes(rightString[i].ToString());
-                for(int j = 0; j < byteListLeftStringChar.Length && j < byteListRightStringChar.Length; j++)
-                {
-                    if(byteListLeftStringChar[j] != byteListRightStringChar[j])
-                    {
-                        diffCount++;
-                    }
-                }
-                if (diffCount != 0)
-                {
-                    DiffsOffsets diffsOffsets = new DiffsOffsets();
-                    diffsOffsets.Offset = i;
-                    diffsOffsets.Diffs = diffCount;
-                    diffOffsetList.Add(diffsOffsets);
-                }
-
-
-                DiffsOffsetsList = diffOffsetList;
-            }
-
-            if (diffOffsetList.Count == 0)
-            {
-                ResultMessage = "Inputs were equal.";
-            }
-            else
-            {
-                ResultMessage = "Offsets and lenghts of the diffences.";
-            }
-        }
-
-        #endregion
     }
 }

@@ -5,6 +5,8 @@ VisualStudioVersion = 17.1.32407.343
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DiffFinder", "DiffFinder.csproj", "{3EDB78DE-3FF8-4399-8C39-063032BB1334}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DiffFinderTest", "..\DiffFinderTest\DiffFinderTest.csproj", "{A2FEF14A-A1FD-424B-AAE6-8178A14B6073}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{3EDB78DE-3FF8-4399-8C39-063032BB1334}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3EDB78DE-3FF8-4399-8C39-063032BB1334}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3EDB78DE-3FF8-4399-8C39-063032BB1334}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A2FEF14A-A1FD-424B-AAE6-8178A14B6073}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A2FEF14A-A1FD-424B-AAE6-8178A14B6073}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A2FEF14A-A1FD-424B-AAE6-8178A14B6073}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A2FEF14A-A1FD-424B-AAE6-8178A14B6073}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
