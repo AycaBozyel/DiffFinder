@@ -7,8 +7,8 @@ namespace DiffFinder.Business
     {
         public bool IsSameSize(string leftString, string rightString)
         {
-            byte[] leftData = Encoding.UTF8.GetBytes(leftString);
-            byte[] rightData = Encoding.UTF8.GetBytes(rightString);
+            byte[] leftData = Convert.FromBase64String(leftString);
+            byte[] rightData = Convert.FromBase64String(rightString);
 
             if (leftData.Length != rightData.Length)
             {
@@ -35,11 +35,15 @@ namespace DiffFinder.Business
                 int diffCount = 0;
                 byte[] byteListLeftStringChar = Encoding.UTF8.GetBytes(leftString[i].ToString());
                 byte[] byteListRightStringChar = Encoding.UTF8.GetBytes(rightString[i].ToString());
-                for (int j = 0; j < byteListLeftStringChar.Length && j < byteListRightStringChar.Length; j++)
+                
+                for (int j = 0; j < byteListLeftStringChar.Length; j++)
                 {
-                    if (byteListLeftStringChar[j] != byteListRightStringChar[j])
+                    var diff = (byteListLeftStringChar[j] ^ byteListRightStringChar[j]);
+                    diffCount = 0;
+                    while(diff > 0)
                     {
                         diffCount++;
+                        diff &= (diff - 1);
                     }
                 }
                 if (diffCount != 0)
@@ -47,6 +51,8 @@ namespace DiffFinder.Business
                     DiffsOffsets diffsOffsets = new DiffsOffsets();
                     diffsOffsets.Offset = i;
                     diffsOffsets.Diffs = diffCount;
+                    diffsOffsets.LeftChar = leftString[i].ToString();
+                    diffsOffsets.RightChar = rightString[i].ToString();
                     diffOffsetList.Add(diffsOffsets);
                 }
 

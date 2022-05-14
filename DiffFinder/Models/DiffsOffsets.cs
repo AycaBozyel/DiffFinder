@@ -12,6 +12,10 @@ namespace DiffFinder.Models
         public int DiffrenceInformationId { get; set; }
         public int Diffs { get; set; }
         public int Offset { get; set; }
+        [MaxLength(1)]
+        public string LeftChar { get; set; }
+        [MaxLength(1)]
+        public string RightChar { get; set; }
         public virtual DiffrenceInformation DiffrenceInformation { get; set; }
     }
 }
