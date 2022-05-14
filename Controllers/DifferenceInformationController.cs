@@ -57,7 +57,7 @@ namespace DiffFinder.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("DifferenceInformationId,LeftString,RightString,Result")] DiffrenceInformation diffrenceInformation)
+        public IActionResult Create([Bind("DifferenceInformationId,LeftString,RightString")] DiffrenceInformation diffrenceInformation)
         {
             if (ModelState.IsValid)
             {
@@ -65,9 +65,16 @@ namespace DiffFinder.Controllers
                 diffrenceInformation.Result = ResultMessage;
                 diffrenceInformation.DiffsOffsets = DiffsOffsetsList;
                 _context.Add(diffrenceInformation);
-                await _context.SaveChangesAsync();
 
-                //DiffOffsetleri de kaydet :) 
+                _ = _context.SaveChangesAsync();
+
+                foreach(DiffsOffsets diffsOffsets in diffrenceInformation.DiffsOffsets)
+                {
+                    diffsOffsets.DiffrenceInformation = diffrenceInformation;
+                    diffsOffsets.DiffrenceInformationId = diffrenceInformation.DifferenceInformationId;
+                    _context.DiffsOffsets.Add(diffsOffsets);
+                    _ = _context.SaveChangesAsync();
+                } 
                 
                 return RedirectToAction(nameof(Index));
             }
@@ -83,7 +90,7 @@ namespace DiffFinder.Controllers
                 return NotFound();
             }
 
-            return View();
+            return View(diffInfo);
         }
 
         // POST: DifferenceInformationController/Edit/5
@@ -146,7 +153,12 @@ namespace DiffFinder.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
-
+        // GET: DiffsOffsets/List/5
+        public async Task<IActionResult> List(int id)
+        {
+            var mvcWebAppDbContext = _context.DiffsOffsets.Include(d => d.DiffrenceInformation).Where(x => x.DiffrenceInformationId == id);
+            return View(await mvcWebAppDbContext.ToListAsync());
+        }
 
         private bool DiffInfoExist(int id)
         {
@@ -157,14 +169,11 @@ namespace DiffFinder.Controllers
 
         private void CalculateDifference(DiffrenceInformation diffrenceInformation)
         {
-            string leftString = diffrenceInformation.LeftString;
-            string rightString = diffrenceInformation.RightString;
+            string leftString = diffrenceInformation.LeftString.Trim();
+            string rightString = diffrenceInformation.RightString.Trim();
 
-            byte[] leftData = Convert.FromBase64String(leftString);
-            string decodedLeftString = Encoding.UTF8.GetString(leftData);
-
-            byte[] rightData = Convert.FromBase64String(rightString);
-            string decodedRightString = Encoding.UTF8.GetString(rightData);
+            byte[] leftData = Encoding.UTF8.GetBytes(leftString);
+            byte[] rightData = Encoding.UTF8.GetBytes(rightString);
 
             if(leftData.Length != rightData.Length)
             {
@@ -172,12 +181,12 @@ namespace DiffFinder.Controllers
                 DiffsOffsetsList = new List<DiffsOffsets>();
             }
             List<DiffsOffsets> diffOffsetList = new List<DiffsOffsets>();
-            for(int i = 0; i < decodedLeftString.Length; i++)
+            for(int i = 0; i < leftString.Length; i++)
             {
                 int diffCount = 0;
-                byte[] byteListLeftStringChar = Encoding.UTF8.GetBytes(decodedLeftString[i].ToString());
-                byte[] byteListRightStringChar = Encoding.UTF8.GetBytes(decodedRightString[i].ToString());
-                for(int j = 0; j < byteListLeftStringChar.Length; j++)
+                byte[] byteListLeftStringChar = Encoding.UTF8.GetBytes(leftString[i].ToString());
+                byte[] byteListRightStringChar = Encoding.UTF8.GetBytes(rightString[i].ToString());
+                for(int j = 0; j < byteListLeftStringChar.Length && j < byteListRightStringChar.Length; j++)
                 {
                     if(byteListLeftStringChar[j] != byteListRightStringChar[j])
                     {
@@ -195,8 +204,8 @@ namespace DiffFinder.Controllers
 
                 DiffsOffsetsList = diffOffsetList;
             }
-            
-            if (String.Equals(decodedLeftString, decodedRightString))
+
+            if (diffOffsetList.Count == 0)
             {
                 ResultMessage = "Inputs were equal.";
             }
