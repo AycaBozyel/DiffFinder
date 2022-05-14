@@ -1,0 +1,47 @@
+﻿@model IEnumerable<DiffFinder.Models.DiffsOffsets>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Diffs)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Offset)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DiffrenceInformation)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Diffs)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Offset)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DiffrenceInformation.LeftString)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.DiffsOffsetsId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.DiffsOffsetsId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.DiffsOffsetsId">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
