@@ -2,6 +2,7 @@
 using DiffFinder.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -9,9 +10,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DiffFinder.Migrations
 {
     [DbContext(typeof(MvcWebAppDbContext))]
-    partial class MvcWebAppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220514210552_202205150005")]
+    partial class _202205150005
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "6.0.5");
