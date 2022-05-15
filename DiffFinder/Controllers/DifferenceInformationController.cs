@@ -105,6 +105,9 @@ namespace DiffFinder.Controllers
             {
                 try
                 {
+                    Response response = diffFinderService.CalculateDifference(diffrenceInformation);
+                    diffrenceInformation.Result = response.ResultMessage;
+                    diffrenceInformation.DiffsOffsets = response.DiffsOffsetList;
                     _context.Update(diffrenceInformation);
                     await _context.SaveChangesAsync();
                 }

@@ -5,6 +5,7 @@ namespace DiffFinder.Business
 {
     public class DiffFinderService
     {
+        //this function checks both string is same size. If their size is not equal, return false. 
         public bool IsSameSize(string leftString, string rightString)
         {
             byte[] leftData = Convert.FromBase64String(leftString);
@@ -16,7 +17,7 @@ namespace DiffFinder.Business
             }
             return true;
         }
-
+        //this function calculate the difference and offset values. 
         public Response CalculateDifference(DiffrenceInformation diffrenceInformation)
         {
             string leftString = diffrenceInformation.LeftString.Trim();
@@ -71,7 +72,7 @@ namespace DiffFinder.Business
             return response;
         }
     }
-
+    //this class for return the result.
     public class Response
     {
         public string ResultMessage { get; set; }
